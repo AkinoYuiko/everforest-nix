@@ -3,7 +3,7 @@
   _class = "homeManager";
   imports = [
     (lib.modules.importApply ../default.nix {
-      everforestModules = import ./darwin-modules;
+      everforestModules = import ./darwin-modules.nix;
     })
   ];
 }
