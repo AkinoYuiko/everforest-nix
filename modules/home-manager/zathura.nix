@@ -1,0 +1,34 @@
+{ everforestLib, everforestPalette }:
+{ config, lib, ... }:
+let
+  cfg = config.everforest.zathura;
+in
+{
+  options.everforest.zathura = everforestLib.mkEverforestOption { name = "zathura"; };
+  config = {
+    programs.zathura.options = lib.mkIf (cfg.enable && config.programs.zathura.enable) {    
+      default-bg = lib.mkDefault everforestPalette.bg0;
+      default-fg = lib.mkDefault everforestPalette.fg;
+      statusbar-bg = lib.mkDefault everforestPalette.bg1;
+      statusbar-fg = lib.mkDefault everforestPalette.fg;
+      inputbar-bg = lib.mkDefault everforestPalette.statusline1;
+      inputbar-fg = lib.mkDefault everforestPalette.bg0;
+      notification-bg = lib.mkDefault everforestPalette.bg-blue;
+      notification-fg = lib.mkDefault everforestPalette.blue;
+      notification-error-bg = lib.mkDefault everforestPalette.bg-red;
+      notification-error-fg = lib.mkDefault everforestPalette.red;
+      notification-warning-bg = lib.mkDefault everforestPalette.bg-yellow;
+      notification-warning-fg = lib.mkDefault everforestPalette.yellow;
+      highlight-color = lib.mkDefault everforestPalette.yellow;
+      highlight-active-color = lib.mkDefault everforestPalette.red;
+      completion-bg = lib.mkDefault everforestPalette.bg2;
+      completion-fg = lib.mkDefault everforestPalette.fg;
+      completion-highlight-bg = lib.mkDefault everforestPalette.statusline1;
+      completion-highlight-fg = lib.mkDefault everforestPalette.bg0;
+      recolor-darkcolor = lib.mkDefault everforestPalette.bg0;
+      recolor-lightcolor = lib.mkDefault everforestPalette.fg;
+      recolor = lib.mkDefault true;
+      recolor-keephue = lib.mkDefault false;
+    };
+  };
+}

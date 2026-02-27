@@ -1,0 +1,17 @@
+[
+  ./tofi.nix
+  ./rofi.nix
+  ./yazi.nix
+  ./chrome.nix
+  ./bat.nix
+  ./waybar.nix
+  ./hyprland.nix
+  ./hyprlock.nix
+  ./helix.nix
+  ./ghostty.nix
+  ./zathura.nix
+  ./fzf.nix
+  ./starship.nix
+  ./cursor.nix
+  ./gtk.nix
+]
