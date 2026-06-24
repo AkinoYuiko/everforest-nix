@@ -7,6 +7,7 @@
   # ./zathura.nix
   ./fzf.nix
   ./starship.nix
+  ./opencode.nix
   # ./cursor.nix
   # ./gtk.nix
 ]

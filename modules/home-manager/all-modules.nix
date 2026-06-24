@@ -14,4 +14,5 @@
   ./starship.nix
   ./cursor.nix
   ./gtk.nix
+  ./opencode.nix
 ]

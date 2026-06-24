@@ -32,6 +32,7 @@ The Everforest theme's palette is also available under ```programs.everforest.pa
 - [x] hyprlock (you have to choose the colors in your own rofi config)
 - [x] cursor
 - [x] tofi
+- [x] opencode
 - [ ] heroic games launcher
 - [ ] spotify-client
 - [ ] much more...
