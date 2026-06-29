@@ -2,7 +2,7 @@
 
 Everforest theme for almost everything in Nix, heavily inspired by the [Catppuccin's Nix repo](https://github.com/catppuccin/nix).
 
-Currently, it only supports the dark variant and the medium contrast.
+Currently, it only supports the dark variant and the hard contrast.
 
 The Everforest theme's palette is also available under ```programs.everforest.palette``` attribute, for you to use in your own configuration (see examples on section below).
 
@@ -97,18 +97,19 @@ The palette is an attribute set, as following:
 
 ```nix
 {
-  bg-dim = "#232A2E";
-  bg0 = "#2D353B";
-  bg1 = "#343F44";
-  bg2 = "#3D484D";
-  bg3 = "#475258";
-  bg4 = "#4F585E";
-  bg5 = "#56635f";
-  bg-visual = "#543A48";
-  bg-red = "#514045";
-  bg-green = "#425047";
-  bg-blue = "#3A515D";
-  bg-yellow = "#4D4C43";
+  bg_dim = "#1E2326";
+  bg0 = "#272E33";
+  bg1 = "#2E383C";
+  bg2 = "#374145";
+  bg3 = "#414B50";
+  bg4 = "#495156";
+  bg5 = "#4F5B58";
+  bg_visual = "#4C3743";
+  bg_red = "#493B40";
+  bg_green = "#3C4841";
+  bg_blue = "#384B55";
+  bg_yellow = "#45443C";
+  bg_purple = "#463F48";
   fg = "#D3C6AA";
   red = "#E67E80";
   orange = "#E69875";
@@ -159,7 +160,7 @@ The palette is an attribute set, as following:
     <your code>
      tooltip = {
       <your code>
-      background = @bg-dim;
+      background = @bg_dim;
     }
   ''
 }

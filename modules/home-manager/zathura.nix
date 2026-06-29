@@ -6,18 +6,18 @@ in
 {
   options.everforest.zathura = everforestLib.mkEverforestOption { name = "zathura"; };
   config = {
-    programs.zathura.options = lib.mkIf (cfg.enable && config.programs.zathura.enable) {    
+    programs.zathura.options = lib.mkIf (cfg.enable && config.programs.zathura.enable) {
       default-bg = lib.mkDefault everforestPalette.bg0;
       default-fg = lib.mkDefault everforestPalette.fg;
       statusbar-bg = lib.mkDefault everforestPalette.bg1;
       statusbar-fg = lib.mkDefault everforestPalette.fg;
       inputbar-bg = lib.mkDefault everforestPalette.statusline1;
       inputbar-fg = lib.mkDefault everforestPalette.bg0;
-      notification-bg = lib.mkDefault everforestPalette.bg-blue;
+      notification-bg = lib.mkDefault everforestPalette.bg_blue;
       notification-fg = lib.mkDefault everforestPalette.blue;
-      notification-error-bg = lib.mkDefault everforestPalette.bg-red;
+      notification-error-bg = lib.mkDefault everforestPalette.bg_red;
       notification-error-fg = lib.mkDefault everforestPalette.red;
-      notification-warning-bg = lib.mkDefault everforestPalette.bg-yellow;
+      notification-warning-bg = lib.mkDefault everforestPalette.bg_yellow;
       notification-warning-fg = lib.mkDefault everforestPalette.yellow;
       highlight-color = lib.mkDefault everforestPalette.yellow;
       highlight-active-color = lib.mkDefault everforestPalette.red;
