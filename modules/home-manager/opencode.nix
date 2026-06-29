@@ -1,4 +1,4 @@
-{ everforestLib, ... }:
+{ everforestLib, everforestPalette }:
 { config, lib, ... }:
 let
   cfg = config.everforest.opencode;
@@ -16,27 +16,29 @@ in
       themes.everforest-dark-hard = {
         "$schema" = "https://opencode.ai/theme.json";
         defs = {
-          bg0 = "#272e33";
-          bg1 = "#2e383c";
-          bg2 = "#374145";
-          bg3 = "#414b50";
-          bg4 = "#495156";
-          bg5 = "#4f5b58";
-          bg_red = "#4c3743";
-          bg_green = "#3c4841";
-          bg_blue = "#384b55";
-          bg_yellow = "#45443c";
-          fg = "#d3c6aa";
-          red = "#e67e80";
-          orange = "#e69875";
-          yellow = "#dbbc7f";
-          green = "#a7c080";
-          aqua = "#83c092";
-          blue = "#7fbbb3";
-          purple = "#d699b6";
-          grey0 = "#7a8478";
-          grey1 = "#859289";
-          grey2 = "#9da9a0";
+          inherit (everforestPalette)
+            bg0
+            bg1
+            bg2
+            bg3
+            bg4
+            bg5
+            bg_red
+            bg_green
+            bg_blue
+            bg_yellow
+            fg
+            red
+            orange
+            yellow
+            green
+            aqua
+            blue
+            purple
+            grey0
+            grey1
+            grey2
+            ;
         };
         theme = {
           primary = "green";
