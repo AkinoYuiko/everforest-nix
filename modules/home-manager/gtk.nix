@@ -1,7 +1,17 @@
-{ everforestLib, ... }:
-{ pkgs, config, lib, ... }:
+{ applicationThemeNames, everforestLib, ... }:
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
 let
-  cfg = config.everforest.gtk;
+  applicationThemeName =
+    if builtins.length applicationThemeNames == 1 then
+      builtins.head applicationThemeNames
+    else
+      throw "Home Manager single-theme module expected exactly one Application Theme name";
+  cfg = config.everforest.${applicationThemeName};
   everforest-gtk-theme-medium = pkgs.stdenv.mkDerivation rec {
     name = "everforest-gtk-theme-medium";
     pname = name;
@@ -15,7 +25,7 @@ let
     buildInputs = [
       pkgs.gnome-themes-extra
       pkgs.sassc
-     ];
+    ];
     propagatedUserEnvPkgs = [ pkgs.gtk-engine-murrine ];
     installPhase = ''
       runHook preInstall
@@ -57,7 +67,9 @@ let
   };
 in
 {
-  options.everforest.gtk = everforestLib.mkEverforestOption { name = "gtk"; };
+  options.everforest.${applicationThemeName} = everforestLib.mkEverforestOption {
+    name = applicationThemeName;
+  };
   config = lib.mkIf (cfg.enable && config.gtk.enable) {
     gtk = {
       theme = lib.mkDefault {
@@ -83,11 +95,12 @@ in
         color-scheme = "prefer-dark";
       };
     };
-    xdg.configFile = let
-      gtk4 = "${config.gtk.theme.package}/share/themes/everforest/gtk-4.0";
-      gtk3 = "${config.gtk.theme.package}/share/themes/everforest/gtk-3.0";
-      gtk2 = "${config.gtk.theme.package}/share/themes/everforest/gtk-3.0";
-    in
+    xdg.configFile =
+      let
+        gtk4 = "${config.gtk.theme.package}/share/themes/everforest/gtk-4.0";
+        gtk3 = "${config.gtk.theme.package}/share/themes/everforest/gtk-3.0";
+        gtk2 = "${config.gtk.theme.package}/share/themes/everforest/gtk-3.0";
+      in
       {
         "gtk-4.0/assets".source = "${gtk4}/assets";
         "gtk-4.0/gtk.css".source = "${gtk4}/gtk.css";

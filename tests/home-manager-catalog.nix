@@ -10,39 +10,120 @@ let
   linuxPkgs = nixpkgs.legacyPackages.x86_64-linux;
   darwinPkgs = nixpkgs.legacyPackages.aarch64-darwin;
 
-  expectedLinuxNames = [
-    "tofi"
-    "rofi"
-    "yazi"
-    "chromium"
-    "brave"
-    "vivaldi"
-    "bat"
-    "waybar"
-    "hyprland"
-    "hyprlock"
-    "helix"
-    "ghostty"
-    "zathura"
-    "fzf"
-    "starship"
-    "cursor"
-    "gtk"
-    "opencode"
+  expectedApplicationThemes = [
+    {
+      name = "tofi";
+      platforms = [ "linux" ];
+    }
+    {
+      name = "rofi";
+      platforms = [ "linux" ];
+    }
+    {
+      name = "yazi";
+      platforms = [
+        "linux"
+        "darwin"
+      ];
+    }
+    {
+      name = "brave";
+      platforms = [
+        "linux"
+        "darwin"
+      ];
+    }
+    {
+      name = "chromium";
+      platforms = [
+        "linux"
+        "darwin"
+      ];
+    }
+    {
+      name = "vivaldi";
+      platforms = [
+        "linux"
+        "darwin"
+      ];
+    }
+    {
+      name = "bat";
+      platforms = [
+        "linux"
+        "darwin"
+      ];
+    }
+    {
+      name = "waybar";
+      platforms = [ "linux" ];
+    }
+    {
+      name = "hyprland";
+      platforms = [ "linux" ];
+    }
+    {
+      name = "hyprlock";
+      platforms = [ "linux" ];
+    }
+    {
+      name = "helix";
+      platforms = [
+        "linux"
+        "darwin"
+      ];
+    }
+    {
+      name = "ghostty";
+      platforms = [
+        "linux"
+        "darwin"
+      ];
+    }
+    {
+      name = "zathura";
+      platforms = [ "linux" ];
+    }
+    {
+      name = "fzf";
+      platforms = [
+        "linux"
+        "darwin"
+      ];
+    }
+    {
+      name = "starship";
+      platforms = [
+        "linux"
+        "darwin"
+      ];
+    }
+    {
+      name = "cursor";
+      platforms = [ "linux" ];
+    }
+    {
+      name = "gtk";
+      platforms = [ "linux" ];
+    }
+    {
+      name = "opencode";
+      platforms = [
+        "linux"
+        "darwin"
+      ];
+    }
   ];
 
-  expectedDarwinNames = [
-    "yazi"
-    "chromium"
-    "brave"
-    "vivaldi"
-    "bat"
-    "helix"
-    "ghostty"
-    "fzf"
-    "starship"
-    "opencode"
-  ];
+  expectedNamesFor =
+    platform:
+    map (theme: theme.name) (
+      builtins.filter (theme: builtins.elem platform theme.platforms) expectedApplicationThemes
+    );
+
+  expectedApplicationThemeNames = map (theme: theme.name) expectedApplicationThemes;
+  expectedLinuxNames = expectedNamesFor "linux";
+  expectedDarwinNames = expectedNamesFor "darwin";
 
   mkHomeConfiguration =
     pkgs: module:
@@ -63,7 +144,7 @@ let
     };
 
   enableAllThemes = {
-    everforest = lib.genAttrs expectedLinuxNames (_: {
+    everforest = lib.genAttrs expectedApplicationThemeNames (_: {
       enable = true;
     });
   };
@@ -82,7 +163,9 @@ let
     ) (builtins.attrNames configuration.options.everforest);
   enabledApplicationThemeNames =
     configuration:
-    builtins.filter (name: configuration.config.everforest.${name}.enable) expectedLinuxNames;
+    builtins.filter (
+      name: configuration.config.everforest.${name}.enable
+    ) expectedApplicationThemeNames;
 
   unsupportedPlatform = builtins.tryEval (
     builtins.deepSeq (mkHomeConfiguration nixpkgs.legacyPackages.x86_64-freebsd { }).config.everforest
@@ -91,10 +174,10 @@ let
 in
 assert
   lib.sort builtins.lessThan (applicationThemeOptionNames linuxConfiguration)
-  == lib.sort builtins.lessThan expectedLinuxNames;
+  == lib.sort builtins.lessThan expectedApplicationThemeNames;
 assert
   lib.sort builtins.lessThan (applicationThemeOptionNames darwinConfiguration)
-  == lib.sort builtins.lessThan expectedLinuxNames;
+  == lib.sort builtins.lessThan expectedApplicationThemeNames;
 assert
   lib.sort builtins.lessThan (enabledApplicationThemeNames linuxConfiguration)
   == lib.sort builtins.lessThan expectedLinuxNames;

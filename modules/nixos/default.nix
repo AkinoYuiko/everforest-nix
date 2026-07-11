@@ -2,6 +2,13 @@
 {
   _class = "nixos";
   imports = [
-    (lib.modules.importApply ../default.nix { everforestModules = import ./all-modules.nix; } )
+    (lib.modules.importApply ../default.nix {
+      everforestModuleDescriptors = [
+        {
+          file = ./tty.nix;
+          applicationThemeNames = [ "tty" ];
+        }
+      ];
+    })
   ];
 }

@@ -6,15 +6,12 @@ in
   _class = "homeManager";
   imports = [
     (lib.modules.importApply ../default.nix {
-      everforestModules = catalog.moduleFiles;
+      everforestModuleDescriptors = catalog.moduleDescriptors;
     })
     (
       { pkgs, ... }:
-      let
-        platformCatalog = catalog.forHostPlatform pkgs.stdenv.hostPlatform;
-      in
       {
-        config.everforest = lib.genAttrs (map (entry: entry.name) platformCatalog.ineligible) (_: {
+        config.everforest = lib.genAttrs (catalog.ineligibleThemeNamesFor pkgs.stdenv.hostPlatform) (_: {
           enable = lib.mkForce false;
         });
       }

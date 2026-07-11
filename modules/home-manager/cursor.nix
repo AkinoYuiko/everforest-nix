@@ -1,10 +1,22 @@
-{ everforestLib, ... }:
-{ pkgs, config, lib, ... }:
+{ applicationThemeNames, everforestLib, ... }:
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
 let
-  cfg = config.everforest.cursor;
+  applicationThemeName =
+    if builtins.length applicationThemeNames == 1 then
+      builtins.head applicationThemeNames
+    else
+      throw "Home Manager single-theme module expected exactly one Application Theme name";
+  cfg = config.everforest.${applicationThemeName};
 in
 {
-  options.everforest.cursor = everforestLib.mkEverforestOption { name = "cursor"; };
+  options.everforest.${applicationThemeName} = everforestLib.mkEverforestOption {
+    name = applicationThemeName;
+  };
   config = {
     home.pointerCursor = lib.mkIf cfg.enable {
       enable = lib.mkDefault true;

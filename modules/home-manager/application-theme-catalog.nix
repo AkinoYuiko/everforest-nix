@@ -5,165 +5,268 @@ let
     "darwin"
   ];
 
-  catalogEntries = [
+  moduleGroups = [
     {
-      name = "tofi";
       file = ./tofi.nix;
-      platforms = [ "linux" ];
+      themes = [
+        {
+          name = "tofi";
+          platforms = [ "linux" ];
+        }
+      ];
     }
     {
-      name = "rofi";
       file = ./rofi.nix;
-      platforms = [ "linux" ];
+      themes = [
+        {
+          name = "rofi";
+          platforms = [ "linux" ];
+        }
+      ];
     }
     {
-      name = "yazi";
       file = ./yazi.nix;
-      platforms = [
-        "linux"
-        "darwin"
+      themes = [
+        {
+          name = "yazi";
+          platforms = [
+            "linux"
+            "darwin"
+          ];
+        }
       ];
     }
     {
-      name = "chrome";
       file = ./chrome.nix;
-      platforms = [
-        "linux"
-        "darwin"
+      themes = [
+        {
+          name = "brave";
+          platforms = [
+            "linux"
+            "darwin"
+          ];
+        }
+        {
+          name = "chromium";
+          platforms = [
+            "linux"
+            "darwin"
+          ];
+        }
+        {
+          name = "vivaldi";
+          platforms = [
+            "linux"
+            "darwin"
+          ];
+        }
       ];
     }
     {
-      name = "bat";
       file = ./bat.nix;
-      platforms = [
-        "linux"
-        "darwin"
+      themes = [
+        {
+          name = "bat";
+          platforms = [
+            "linux"
+            "darwin"
+          ];
+        }
       ];
     }
     {
-      name = "waybar";
       file = ./waybar.nix;
-      platforms = [ "linux" ];
+      themes = [
+        {
+          name = "waybar";
+          platforms = [ "linux" ];
+        }
+      ];
     }
     {
-      name = "hyprland";
       file = ./hyprland.nix;
-      platforms = [ "linux" ];
+      themes = [
+        {
+          name = "hyprland";
+          platforms = [ "linux" ];
+        }
+      ];
     }
     {
-      name = "hyprlock";
       file = ./hyprlock.nix;
-      platforms = [ "linux" ];
+      themes = [
+        {
+          name = "hyprlock";
+          platforms = [ "linux" ];
+        }
+      ];
     }
     {
-      name = "helix";
       file = ./helix.nix;
-      platforms = [
-        "linux"
-        "darwin"
+      themes = [
+        {
+          name = "helix";
+          platforms = [
+            "linux"
+            "darwin"
+          ];
+        }
       ];
     }
     {
-      name = "ghostty";
       file = ./ghostty.nix;
-      platforms = [
-        "linux"
-        "darwin"
+      themes = [
+        {
+          name = "ghostty";
+          platforms = [
+            "linux"
+            "darwin"
+          ];
+        }
       ];
     }
     {
-      name = "zathura";
       file = ./zathura.nix;
-      platforms = [ "linux" ];
+      themes = [
+        {
+          name = "zathura";
+          platforms = [ "linux" ];
+        }
+      ];
     }
     {
-      name = "fzf";
       file = ./fzf.nix;
-      platforms = [
-        "linux"
-        "darwin"
+      themes = [
+        {
+          name = "fzf";
+          platforms = [
+            "linux"
+            "darwin"
+          ];
+        }
       ];
     }
     {
-      name = "starship";
       file = ./starship.nix;
-      platforms = [
-        "linux"
-        "darwin"
+      themes = [
+        {
+          name = "starship";
+          platforms = [
+            "linux"
+            "darwin"
+          ];
+        }
       ];
     }
     {
-      name = "cursor";
       file = ./cursor.nix;
-      platforms = [ "linux" ];
+      themes = [
+        {
+          name = "cursor";
+          platforms = [ "linux" ];
+        }
+      ];
     }
     {
-      name = "gtk";
       file = ./gtk.nix;
-      platforms = [ "linux" ];
+      themes = [
+        {
+          name = "gtk";
+          platforms = [ "linux" ];
+        }
+      ];
     }
     {
-      name = "opencode";
       file = ./opencode.nix;
-      platforms = [
-        "linux"
-        "darwin"
+      themes = [
+        {
+          name = "opencode";
+          platforms = [
+            "linux"
+            "darwin"
+          ];
+        }
       ];
     }
   ];
 
   fail = message: throw "Invalid Home Manager Application Theme Catalog: ${message}";
 
-  validateEntry =
-    entry:
+  validateTheme =
+    theme:
     let
       label =
-        if builtins.isAttrs entry && entry ? name && builtins.isString entry.name then
-          "`${entry.name}`"
+        if builtins.isAttrs theme && theme ? name && builtins.isString theme.name then
+          "`${theme.name}`"
         else
           "<unnamed>";
       unknownPlatforms =
-        if builtins.isAttrs entry && entry ? platforms && builtins.isList entry.platforms then
-          builtins.filter (platform: !(builtins.elem platform supportedPlatforms)) entry.platforms
+        if builtins.isAttrs theme && theme ? platforms && builtins.isList theme.platforms then
+          builtins.filter (platform: !(builtins.elem platform supportedPlatforms)) theme.platforms
         else
           [ ];
     in
-    if !builtins.isAttrs entry then
-      fail "each entry must be an attribute set"
-    else if !(entry ? name) || !builtins.isString entry.name || entry.name == "" then
+    if !builtins.isAttrs theme then
+      fail "each Application Theme must be an attribute set"
+    else if !(theme ? name) || !builtins.isString theme.name || theme.name == "" then
       fail "${label} must have a non-empty string `name`"
-    else if !(entry ? file) || !builtins.isPath entry.file then
-      fail "${label} must have a path-valued `file`"
-    else if !builtins.pathExists entry.file then
-      fail "${label} references a missing module file"
-    else if !(entry ? platforms) || !builtins.isList entry.platforms || entry.platforms == [ ] then
+    else if !(theme ? platforms) || !builtins.isList theme.platforms || theme.platforms == [ ] then
       fail "${label} must have at least one platform"
-    else if !builtins.all builtins.isString entry.platforms then
+    else if !builtins.all builtins.isString theme.platforms then
       fail "${label} platforms must be strings"
     else if unknownPlatforms != [ ] then
       fail "${label} uses unsupported platforms: ${builtins.concatStringsSep ", " unknownPlatforms}"
     else
-      entry;
+      theme;
+
+  validateModuleGroup =
+    group:
+    let
+      label =
+        if builtins.isAttrs group && group ? file && builtins.isPath group.file then
+          "`${builtins.toString group.file}`"
+        else
+          "<unnamed module>";
+    in
+    if !builtins.isAttrs group then
+      fail "each module group must be an attribute set"
+    else if !(group ? file) || !builtins.isPath group.file then
+      fail "${label} must have a path-valued `file`"
+    else if !builtins.pathExists group.file then
+      fail "${label} references a missing module file"
+    else if !(group ? themes) || !builtins.isList group.themes || group.themes == [ ] then
+      fail "${label} must have at least one Application Theme"
+    else
+      group // { themes = map validateTheme group.themes; };
 
   validate =
-    entries:
+    groups:
     let
-      validatedEntries = map validateEntry entries;
-      names = map (entry: entry.name) validatedEntries;
-      duplicateNames = lib.unique (
-        builtins.filter (
-          name: builtins.length (builtins.filter (candidate: candidate == name) names) > 1
-        ) names
-      );
+      validatedGroups = map validateModuleGroup groups;
+      moduleFiles = map (group: builtins.toString group.file) validatedGroups;
+      themes = lib.concatMap (group: group.themes) validatedGroups;
+      themeNames = map (theme: theme.name) themes;
+      duplicatesIn =
+        values:
+        lib.unique (
+          builtins.filter (
+            value: builtins.length (builtins.filter (candidate: candidate == value) values) > 1
+          ) values
+        );
+      duplicateModuleFiles = duplicatesIn moduleFiles;
+      duplicateThemeNames = duplicatesIn themeNames;
     in
-    if !builtins.isList entries then
+    if !builtins.isList groups then
       fail "catalog must be a list"
-    else if duplicateNames != [ ] then
-      fail "duplicate names: ${builtins.concatStringsSep ", " duplicateNames}"
+    else if duplicateModuleFiles != [ ] then
+      fail "duplicate module files: ${builtins.concatStringsSep ", " duplicateModuleFiles}"
+    else if duplicateThemeNames != [ ] then
+      fail "duplicate Application Theme names: ${builtins.concatStringsSep ", " duplicateThemeNames}"
     else
-      validatedEntries;
+      validatedGroups;
 
-  entries = validate catalogEntries;
+  groups = validate moduleGroups;
+  themes = lib.concatMap (group: group.themes) groups;
 
   platformName =
     hostPlatform:
@@ -175,17 +278,15 @@ let
       throw "everforest Home Manager module supports Linux and Darwin only; got `${hostPlatform.system}`";
 in
 {
-  inherit entries validate;
+  moduleDescriptors = map (group: {
+    inherit (group) file;
+    applicationThemeNames = map (theme: theme.name) group.themes;
+  }) groups;
 
-  moduleFiles = map (entry: entry.file) entries;
-
-  forHostPlatform =
+  ineligibleThemeNamesFor =
     hostPlatform:
     let
       platform = platformName hostPlatform;
     in
-    {
-      eligible = builtins.filter (entry: builtins.elem platform entry.platforms) entries;
-      ineligible = builtins.filter (entry: !(builtins.elem platform entry.platforms)) entries;
-    };
+    map (theme: theme.name) (builtins.filter (theme: !(builtins.elem platform theme.platforms)) themes);
 }
