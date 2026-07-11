@@ -213,6 +213,31 @@ The palette is an attribute set, as following:
 
 </details>
 
+## Development
+
+Run all reproducible repository tests through the flake checks:
+
+```sh
+nix flake check
+```
+
+To compare the local dark hard palette with the latest palette from
+[`sainnhe/everforest`](https://github.com/sainnhe/everforest), run:
+
+```sh
+nix run .#check-upstream-palette
+```
+
+Pass a branch, tag, or commit to compare against a specific upstream revision:
+
+```sh
+nix run .#check-upstream-palette -- <revision>
+```
+
+The upstream comparison accesses the network and intentionally is not part of
+`nix flake check`; it detects upstream drift rather than testing only the
+reproducible state of this repository.
+
 ## Acknowledgements to other projects
 
 We use other projects for some of the apps, so big thanks to them!

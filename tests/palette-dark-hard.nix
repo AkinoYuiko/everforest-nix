@@ -1,4 +1,6 @@
+{ nixpkgs, system }:
 let
+  pkgs = nixpkgs.legacyPackages.${system};
   palette = import ../palette;
   expected = {
     bg_dim = "#1E2326";
@@ -31,4 +33,6 @@ let
   };
 in
 assert palette == expected;
-true
+pkgs.runCommand "everforest-palette-dark-hard" { } ''
+  touch "$out"
+''
