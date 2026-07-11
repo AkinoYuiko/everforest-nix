@@ -1,8 +1,13 @@
-{ everforestModules }:
-{ pkgs, config, lib, ... }:
+{ everforestModuleDescriptors }:
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
 let
   everforestLib = import ./lib { inherit pkgs config lib; };
-  everforestPalette = import ../palette;  
+  everforestPalette = import ../palette;
 in
 {
   options.everforest = {
@@ -14,8 +19,11 @@ in
       description = "The Everforest theme's palette.";
     };
   };
-  imports = map (module: lib.modules.importApply module {
-    everforestLib = everforestLib;
-    everforestPalette = everforestPalette;
-  } ) everforestModules;
+  imports = map (
+    descriptor:
+    lib.modules.importApply descriptor.file {
+      inherit everforestLib everforestPalette;
+      inherit (descriptor) applicationThemeNames;
+    }
+  ) everforestModuleDescriptors;
 }

@@ -16,5 +16,6 @@ Home Manager module imports cannot depend on `pkgs` supplied through `_module.ar
 
 - Linux and Darwin callers continue to import `homeModules.everforest` in the same way.
 - All Application Theme options are visible on both supported platforms, but ineligible themes are forced to `enable = false` and cannot be explicitly enabled.
-- Platform eligibility is declared once in the Home Manager Application Theme Catalog: all 16 current themes are eligible on Linux and 8 are eligible on Darwin.
+- Platform eligibility is declared per Application Theme in the Home Manager Application Theme Catalog. Multiple Application Themes may share one statically imported module file while retaining independent platform eligibility.
+- The Catalog produces one static module descriptor per module file and the public Application Theme names that must be disabled for a host platform.
 - Platforms other than Linux and Darwin fail evaluation explicitly.
