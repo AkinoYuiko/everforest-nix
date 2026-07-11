@@ -4,7 +4,7 @@ Everforest theme for almost everything in Nix, heavily inspired by the [Catppucc
 
 Currently, it only supports the dark variant and the hard contrast.
 
-The Everforest theme's palette is also available under ```programs.everforest.palette``` attribute, for you to use in your own configuration (see examples on section below).
+The Everforest theme's palette is also available under the `everforest.palette` attribute, for use in your own configuration (see the examples below).
 
 <details>
 <summary>Supported apps:</summary>
@@ -89,6 +89,33 @@ Then, you need to configure _home.nix_ and _configuration.nix_, enabling the _ev
 Finally, update your flake and switch to the new configuration.
 
 ## Usage
+
+### Enablement
+
+`everforest.enable` sets the default for every Application Theme, but it does not enable target applications. A theme is applied only when both the Application Theme and its target application are enabled.
+
+```nix
+{
+  everforest.enable = true;
+  programs.ghostty.enable = true;
+
+  # Explicit per-theme settings override the global default.
+  everforest.bat.enable = false;
+}
+```
+
+You can also enable one Application Theme without enabling Everforest globally:
+
+```nix
+{
+  everforest.ghostty.enable = true;
+  programs.ghostty.enable = true;
+}
+```
+
+When upgrading from an older revision, note that Application Themes no longer default to enabled when `everforest.enable` is false or unset. Set `everforest.enable = true` or explicitly enable the individual themes you want.
+
+The Home Manager module supports Linux and Darwin. All Application Theme options are visible on both platforms, but the Home Manager Application Theme Catalog forces platform-ineligible themes off; for example, explicitly enabling a Linux-only theme on Darwin has no effect.
 
 <details>
 <summary>Click here to see the palette</summary>
