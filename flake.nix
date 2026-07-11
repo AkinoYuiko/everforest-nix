@@ -63,35 +63,51 @@
           };
         }
       );
-      checks = forAllSystems (system: {
-        home-manager-catalog = import ./tests/home-manager-catalog.nix {
-          inherit
-            self
-            nixpkgs
-            home-manager
-            system
-            ;
-        };
-        home-manager-enablement = import ./tests/home-manager-enablement.nix {
-          inherit
-            self
-            nixpkgs
-            home-manager
-            system
-            ;
-        };
-        home-manager-opencode = import ./tests/home-manager-opencode.nix {
-          inherit
-            self
-            nixpkgs
-            home-manager
-            system
-            ;
-        };
-        palette-dark-hard = import ./tests/palette-dark-hard.nix {
-          inherit nixpkgs system;
-        };
-      });
+      checks = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        {
+          home-manager-catalog = import ./tests/home-manager-catalog.nix {
+            inherit
+              self
+              nixpkgs
+              home-manager
+              system
+              ;
+          };
+          home-manager-enablement = import ./tests/home-manager-enablement.nix {
+            inherit
+              self
+              nixpkgs
+              home-manager
+              system
+              ;
+          };
+          home-manager-opencode = import ./tests/home-manager-opencode.nix {
+            inherit
+              self
+              nixpkgs
+              home-manager
+              system
+              ;
+          };
+          palette-dark-hard = import ./tests/palette-dark-hard.nix {
+            inherit nixpkgs system;
+          };
+        }
+        // lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
+          home-manager-hypr-rendering = import ./tests/home-manager-hypr-rendering.nix {
+            inherit
+              self
+              nixpkgs
+              home-manager
+              system
+              ;
+          };
+        }
+      );
       homeModules = {
         default = self.homeModules.everforest;
         everforest = mkModule {
