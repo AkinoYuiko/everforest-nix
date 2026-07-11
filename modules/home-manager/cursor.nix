@@ -7,6 +7,7 @@ in
   options.everforest.cursor = everforestLib.mkEverforestOption { name = "cursor"; };
   config = {
     home.pointerCursor = lib.mkIf cfg.enable {
+      enable = lib.mkDefault true;
       name = lib.mkDefault "everforest-cursors";
       size = 32;
       gtk = lib.mkIf config.gtk.enable {

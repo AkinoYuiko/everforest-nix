@@ -60,6 +60,26 @@ let
     programs.chromium.enable = true;
   };
 
+  cursorGlobalDisabled = mkHomeConfiguration "x86_64-linux" { };
+
+  cursorGlobalEnabled = mkHomeConfiguration "x86_64-linux" {
+    everforest.enable = true;
+  };
+
+  cursorExplicitlyEnabled = mkHomeConfiguration "x86_64-linux" {
+    everforest.cursor.enable = true;
+  };
+
+  cursorExplicitlyDisabled = mkHomeConfiguration "x86_64-linux" {
+    everforest.enable = true;
+    everforest.cursor.enable = false;
+  };
+
+  cursorTargetDisabled = mkHomeConfiguration "x86_64-linux" {
+    everforest.cursor.enable = true;
+    home.pointerCursor.enable = false;
+  };
+
   ttyGlobalDisabled = nixpkgs.lib.nixosSystem {
     system = "x86_64-linux";
     modules = [
@@ -94,6 +114,16 @@ assert browserGeneratedOptions.config.everforest.chromium.enable;
 assert !browserGeneratedOptions.config.everforest.brave.enable;
 assert !browserGeneratedOptions.config.everforest.vivaldi.enable;
 assert builtins.length browserGeneratedOptions.config.programs.chromium.extensions == 1;
+assert !cursorGlobalDisabled.config.everforest.cursor.enable;
+assert !cursorGlobalDisabled.config.home.pointerCursor.enable;
+assert cursorGlobalEnabled.config.everforest.cursor.enable;
+assert cursorGlobalEnabled.config.home.pointerCursor.enable;
+assert cursorExplicitlyEnabled.config.everforest.cursor.enable;
+assert cursorExplicitlyEnabled.config.home.pointerCursor.enable;
+assert !cursorExplicitlyDisabled.config.everforest.cursor.enable;
+assert !cursorExplicitlyDisabled.config.home.pointerCursor.enable;
+assert cursorTargetDisabled.config.everforest.cursor.enable;
+assert !cursorTargetDisabled.config.home.pointerCursor.enable;
 assert !ttyGlobalDisabled.config.everforest.tty.enable;
 assert ttyGlobalEnabled.config.everforest.tty.enable;
 assert builtins.length ttyGlobalEnabled.config.console.colors == 16;
