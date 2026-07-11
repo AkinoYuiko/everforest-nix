@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+revision="${1:-master}"
+if (( $# > 1 )); then
+  echo "usage: $0 [revision]" >&2
+  exit 2
+fi
+
+repo_root="${EVERFOREST_REPO_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+upstream_url="https://raw.githubusercontent.com/sainnhe/everforest/${revision}/autoload/everforest.vim"
+temporary_file="$(mktemp)"
+trap 'rm -f "$temporary_file"' EXIT
+
+printf 'Fetching sainnhe/everforest at %s...\n' "$revision"
+curl --fail --location --silent --show-error "$upstream_url" > "$temporary_file"
+
+python3 - "$repo_root/palette/default.nix" "$temporary_file" "$revision" <<'PY'
+import re
+import sys
+from pathlib import Path
+
+local_path = Path(sys.argv[1])
+upstream_path = Path(sys.argv[2])
+revision = sys.argv[3]
+
+entry_pattern = re.compile(r"'([a-z0-9_]+)'\s*:\s*\['(#[0-9a-fA-F]{6})'")
+local_pattern = re.compile(r'^\s*([a-zA-Z0-9_]+)\s*=\s*"(#[0-9a-fA-F]{6})";\s*$')
+
+local = {
+    match.group(1): match.group(2).upper()
+    for line in local_path.read_text().splitlines()
+    if (match := local_pattern.match(line))
+}
+
+lines = upstream_path.read_text().splitlines()
+try:
+    hard_start = next(i for i, line in enumerate(lines) if "a:background ==# 'hard'" in line)
+    dark_background_start = next(
+        i for i in range(hard_start + 1, len(lines)) if "if &background ==# 'dark'" in lines[i]
+    )
+    light_background_start = next(
+        i for i in range(dark_background_start + 1, len(lines)) if lines[i].strip() == "else"
+    )
+    foreground_start = next(
+        i for i in range(light_background_start + 1, len(lines)) if "let palette2" in lines[i]
+    )
+    light_foreground_start = next(
+        i for i in range(foreground_start + 1, len(lines)) if lines[i].strip().startswith("else")
+    )
+except StopIteration:
+    raise SystemExit("Unable to locate the dark hard palette in upstream autoload/everforest.vim")
+
+def entries(start, end):
+    result = {}
+    for line in lines[start:end]:
+        match = entry_pattern.search(line)
+        if match and match.group(1) != "none":
+            result[match.group(1)] = match.group(2).upper()
+    return result
+
+upstream = entries(dark_background_start, light_background_start)
+upstream.update(entries(foreground_start, light_foreground_start))
+
+if not local:
+    raise SystemExit(f"Unable to parse local palette: {local_path}")
+if not upstream:
+    raise SystemExit("Parsed an empty upstream palette")
+
+all_keys = sorted(local.keys() | upstream.keys())
+differences = [key for key in all_keys if local.get(key) != upstream.get(key)]
+if differences:
+    print(f"Palette differs from sainnhe/everforest at {revision}:", file=sys.stderr)
+    for key in differences:
+        print(
+            f"  {key}: local={local.get(key, '<missing>')} upstream={upstream.get(key, '<missing>')}",
+            file=sys.stderr,
+        )
+    raise SystemExit(1)
+
+print(f"Local dark hard palette matches sainnhe/everforest at {revision} ({len(local)} colors).")
+PY

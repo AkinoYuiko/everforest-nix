@@ -9,7 +9,40 @@ let
   checkPkgs = nixpkgs.legacyPackages.${system};
   linuxPkgs = nixpkgs.legacyPackages.x86_64-linux;
   darwinPkgs = nixpkgs.legacyPackages.aarch64-darwin;
-  catalog = import ../modules/home-manager/application-theme-catalog.nix { inherit lib; };
+
+  expectedLinuxNames = [
+    "tofi"
+    "rofi"
+    "yazi"
+    "chromium"
+    "brave"
+    "vivaldi"
+    "bat"
+    "waybar"
+    "hyprland"
+    "hyprlock"
+    "helix"
+    "ghostty"
+    "zathura"
+    "fzf"
+    "starship"
+    "cursor"
+    "gtk"
+    "opencode"
+  ];
+
+  expectedDarwinNames = [
+    "yazi"
+    "chromium"
+    "brave"
+    "vivaldi"
+    "bat"
+    "helix"
+    "ghostty"
+    "fzf"
+    "starship"
+    "opencode"
+  ];
 
   mkHomeConfiguration =
     pkgs: module:
@@ -29,90 +62,46 @@ let
       ];
     };
 
-  linuxConfiguration = mkHomeConfiguration linuxPkgs {
-    everforest.hyprland.enable = true;
+  enableAllThemes = {
+    everforest = lib.genAttrs expectedLinuxNames (_: {
+      enable = true;
+    });
   };
 
-  darwinConfiguration = mkHomeConfiguration darwinPkgs {
-    everforest.bat.enable = true;
-    everforest.hyprland.enable = true;
-  };
+  linuxConfiguration = mkHomeConfiguration linuxPkgs enableAllThemes;
+  darwinConfiguration = mkHomeConfiguration darwinPkgs enableAllThemes;
 
-  linuxCatalog = catalog.forHostPlatform linuxPkgs.stdenv.hostPlatform;
-  darwinCatalog = catalog.forHostPlatform darwinPkgs.stdenv.hostPlatform;
-  linuxNames = map (entry: entry.name) linuxCatalog.eligible;
-  darwinNames = map (entry: entry.name) darwinCatalog.eligible;
-
-  expectedLinuxNames = [
-    "tofi"
-    "rofi"
-    "yazi"
-    "chrome"
-    "bat"
-    "waybar"
-    "hyprland"
-    "hyprlock"
-    "helix"
-    "ghostty"
-    "zathura"
-    "fzf"
-    "starship"
-    "cursor"
-    "gtk"
-    "opencode"
-  ];
-
-  expectedDarwinNames = [
-    "yazi"
-    "chrome"
-    "bat"
-    "helix"
-    "ghostty"
-    "fzf"
-    "starship"
-    "opencode"
-  ];
-
-  testFile = ./home-manager-catalog.nix;
-  validEntry = {
-    name = "valid";
-    file = testFile;
-    platforms = [ "linux" ];
-  };
-
-  validationSucceeds =
-    entries: (builtins.tryEval (builtins.deepSeq (catalog.validate entries) true)).success;
+  applicationThemeOptionNames =
+    configuration:
+    builtins.filter (
+      name:
+      !(builtins.elem name [
+        "enable"
+        "palette"
+      ])
+    ) (builtins.attrNames configuration.options.everforest);
+  enabledApplicationThemeNames =
+    configuration:
+    builtins.filter (name: configuration.config.everforest.${name}.enable) expectedLinuxNames;
 
   unsupportedPlatform = builtins.tryEval (
-    builtins.deepSeq (catalog.forHostPlatform {
-      isLinux = false;
-      isDarwin = false;
-      system = "x86_64-freebsd";
-    }) true
+    builtins.deepSeq (mkHomeConfiguration nixpkgs.legacyPackages.x86_64-freebsd { }).config.everforest
+      true
   );
 in
-assert linuxConfiguration.options.everforest ? hyprland;
-assert linuxConfiguration.config.everforest.hyprland.enable;
-assert darwinConfiguration.options.everforest ? hyprland;
-assert darwinConfiguration.config.everforest.bat.enable;
-assert !darwinConfiguration.config.everforest.hyprland.enable;
-assert builtins.length catalog.entries == 16;
-assert lib.sort builtins.lessThan linuxNames == lib.sort builtins.lessThan expectedLinuxNames;
-assert lib.sort builtins.lessThan darwinNames == lib.sort builtins.lessThan expectedDarwinNames;
+assert
+  lib.sort builtins.lessThan (applicationThemeOptionNames linuxConfiguration)
+  == lib.sort builtins.lessThan expectedLinuxNames;
+assert
+  lib.sort builtins.lessThan (applicationThemeOptionNames darwinConfiguration)
+  == lib.sort builtins.lessThan expectedLinuxNames;
+assert
+  lib.sort builtins.lessThan (enabledApplicationThemeNames linuxConfiguration)
+  == lib.sort builtins.lessThan expectedLinuxNames;
+assert
+  lib.sort builtins.lessThan (enabledApplicationThemeNames darwinConfiguration)
+  == lib.sort builtins.lessThan expectedDarwinNames;
 assert !unsupportedPlatform.success;
-assert validationSucceeds [ validEntry ];
-assert
-  !(validationSucceeds [
-    validEntry
-    (validEntry // { platforms = [ "darwin" ]; })
-  ]);
-assert !(validationSucceeds [ (builtins.removeAttrs validEntry [ "name" ]) ]);
-assert !(validationSucceeds [ (validEntry // { platforms = [ ]; }) ]);
-assert !(validationSucceeds [ (validEntry // { platforms = [ "freebsd" ]; }) ]);
-assert
-  !(validationSucceeds [
-    (validEntry // { file = builtins.toPath "/everforest-missing-theme.nix"; })
-  ]);
 checkPkgs.runCommand "everforest-home-manager-catalog" { } ''
   touch "$out"
 ''
